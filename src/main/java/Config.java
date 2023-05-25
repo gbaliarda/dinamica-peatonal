@@ -9,7 +9,6 @@ public class Config {
     private static double minRadius, maxRadius, vdMax;
     private static double beta;
     private static String staticFile, outputFile;
-    private static double dtSimulation;
     private static long outputInterval;
 
     static {
@@ -23,10 +22,9 @@ public class Config {
             maxRadius = toml.getDouble("simulation.maxRadius");
             vdMax = toml.getDouble("simulation.vdMax");
             beta = toml.getDouble("simulation.beta");
-            dtSimulation = toml.getDouble("simulation.dtSimulation");
             outputInterval = toml.getLong("simulation.outputInterval");
-            staticFile = toml.getString("files.staticFile");
-            outputFile = toml.getString("files.outputFile");
+            staticFile = toml.getString("files.staticInput");
+            outputFile = toml.getString("files.output");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -58,10 +56,6 @@ public class Config {
 
     public static double getBeta() {
         return beta;
-    }
-
-    public static double getDtSimulation() {
-        return dtSimulation;
     }
 
     public static long getOutputInterval() {

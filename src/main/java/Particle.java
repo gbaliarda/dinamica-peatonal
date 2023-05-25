@@ -128,6 +128,10 @@ public class Particle {
         return radius;
     }
 
+    public double getV() {
+        return v;
+    }
+
     public double getVdMax() {
         return vdMax;
     }

@@ -6,11 +6,13 @@ import java.util.stream.Collectors;
 
 public class PedestrianSystem {
     private List<Particle> particles;
+    private double time;
     private double dt;
 
     public PedestrianSystem(List<Particle> particles) {
         this.particles = particles;
         Particle sample = particles.get(0);
+        this.time = 0;
         this.dt = sample.getMinRadius() / (2*sample.getVdMax()); // s
     }
 
@@ -66,7 +68,9 @@ public class PedestrianSystem {
 
         // Remove particles that exit the room
         int previousSize = particles.size();
-        particles = particles.stream().filter(Particle::isOutside).collect(Collectors.toList());
+        particles = particles.stream().filter(particle -> !particle.isOutside()).collect(Collectors.toList());
+
+        this.time += dt;
 
         // Return the amount of particles that exited the room in this time step
         return previousSize - particles.size();
@@ -74,5 +78,13 @@ public class PedestrianSystem {
 
     public boolean hasNextStep() {
         return particles.size() > 0;
+    }
+
+    public List<Particle> getParticles() {
+        return particles;
+    }
+
+    public double getTime() {
+        return time;
     }
 }

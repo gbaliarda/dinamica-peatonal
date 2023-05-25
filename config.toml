@@ -6,7 +6,6 @@ minRadius = 0.15        # m
 maxRadius = 0.32        # m
 beta = 0.9
 vdMax = 2.0             # m/s
-dtSimulation = 0.001    # s
 outputInterval = 10
 
 [files]
