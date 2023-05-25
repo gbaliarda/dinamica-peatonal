@@ -21,7 +21,6 @@ public class App {
         FileWriter outputWriter = new FileWriter(file, true);
 
         List<Particle> particles = parseParticles();
-        System.out.println(particles.size());
 
         PedestrianSystem pedestrianSystem = new PedestrianSystem(particles);
         int timeSteps = 0;

@@ -92,7 +92,7 @@ public class Particle {
             }
 
             double module = Math.sqrt(Math.pow(x - xTarget, 2) + Math.pow(y - 0, 2)); // yTarget = 0
-            escapeDirection = new double[]{(x - xTarget)/module, (y - 0)/module};
+            escapeDirection = new double[]{(xTarget - x)/module, (0 - y)/module};
         }
 
         double direction = Math.atan2(escapeDirection[1], escapeDirection[0]);

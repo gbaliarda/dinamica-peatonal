@@ -1,12 +1,12 @@
 [simulation]
 boxLength = 20           # m
 exitWidth = 1.2         # m
-pedestrians = 200       # units
+pedestrians = 5       # units
 minRadius = 0.15        # m
 maxRadius = 0.32        # m
 beta = 0.9
 vdMax = 2.0             # m/s
-outputInterval = 10
+outputInterval = 1
 
 [files]
 staticInput = "./static.txt"
