@@ -11,6 +11,8 @@ fundamental diagram of pedestrian traffic with an outstanding performance. In th
 free parameters (rmin and rmax) of the model accounts for the great variety of experimental fundamental diagrams
 reported in the literature. Moreover, this variety can be interpreted in terms of these model parameters.
 
+![](https://github.com/gbaliarda/dinamica-peatonal/blob/main/visualization/demo.gif)
+
 # Requirements
 
 - python >= 3.10

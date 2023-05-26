@@ -6,8 +6,9 @@ minRadius = 0.15        # m
 maxRadius = 0.32        # m
 beta = 0.9
 vdMax = 2.0             # m/s
-outputInterval = 1
+outputInterval = 5
 
 [files]
 staticInput = "./static.txt"
 output = "./out/output.txt"
+benchmark = "./out/benchmark.txt"

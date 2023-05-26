@@ -39,8 +39,6 @@ build/
 
 .idea/
 *.txt
-*.mp4
-*.gif
 target/
 out/
 

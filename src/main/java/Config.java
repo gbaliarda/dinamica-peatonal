@@ -8,7 +8,7 @@ public class Config {
     private static long pedestrians;
     private static double minRadius, maxRadius, vdMax;
     private static double beta;
-    private static String staticFile, outputFile;
+    private static String staticFile, outputFile, benchmarkFile;
     private static long outputInterval;
 
     static {
@@ -25,6 +25,7 @@ public class Config {
             outputInterval = toml.getLong("simulation.outputInterval");
             staticFile = toml.getString("files.staticInput");
             outputFile = toml.getString("files.output");
+            benchmarkFile = toml.getString("files.benchmark");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -68,5 +69,9 @@ public class Config {
 
     public static String getOutputFile() {
         return outputFile;
+    }
+
+    public static String getBenchmarkFile() {
+        return benchmarkFile;
     }
 }
