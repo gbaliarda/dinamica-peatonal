@@ -63,20 +63,20 @@ public class Particle {
     }
 
     public void updatePosition(double dt, List<Particle> particlesInContact, List<PedestrianSystem.Walls> wallsInContact) {
-        double[] escapeDirection = new double[]{0, 0};
+        double[] particleDirection = new double[]{0, 0};
 
         boolean isParticleInContact = particlesInContact.size() > 0 || wallsInContact.size() > 0;
         if (isParticleInContact) {
             for (Particle o : particlesInContact) {
                 double[] escapeDirectionFromParticle = getEscapeDirection(o);
-                escapeDirection[0] += escapeDirectionFromParticle[0];
-                escapeDirection[1] += escapeDirectionFromParticle[1];
+                particleDirection[0] += escapeDirectionFromParticle[0];
+                particleDirection[1] += escapeDirectionFromParticle[1];
             }
 
             for (PedestrianSystem.Walls wall : wallsInContact) {
                 double[] escapeDirectionFromWall = wall.getDirection();
-                escapeDirection[0] += escapeDirectionFromWall[0];
-                escapeDirection[1] += escapeDirectionFromWall[1];
+                particleDirection[0] += escapeDirectionFromWall[0];
+                particleDirection[1] += escapeDirectionFromWall[1];
             }
         } else {
             double L = Config.getExitWidth();
@@ -92,10 +92,10 @@ public class Particle {
             }
 
             double module = Math.sqrt(Math.pow(x - xTarget, 2) + Math.pow(y - 0, 2)); // yTarget = 0
-            escapeDirection = new double[]{(xTarget - x)/module, (0 - y)/module};
+            particleDirection = new double[]{(xTarget - x)/module, (0 - y)/module};   // towards the exit
         }
 
-        double direction = Math.atan2(escapeDirection[1], escapeDirection[0]);
+        double direction = Math.atan2(particleDirection[1], particleDirection[0]);
         double vx = v * Math.cos(direction);
         double vy = v * Math.sin(direction);
 
