@@ -18,7 +18,7 @@ public class CellIndexMethod {
         this.map = new HashMap<>(); // cell id to list of particles on the cell index method
         this.cellAmount = (int) Math.floor(L-1); // optimal M for cell index method
         this.mapLength = L;
-        this.interactionRadius = 1; // unitary radius
+        this.interactionRadius = 0; // unitary radius
         this.isPeriodic = isPeriodic;
         double cellSize = (double)L/cellAmount; // cells not used in the simulation, but for the method of computing neighbours
         // assign each particle to a cell on the CIM
@@ -71,7 +71,7 @@ public class CellIndexMethod {
     }
 
     private boolean particlesAreNeighbours(Particle p1, Particle p2) {
-        return !p1.equals(p2) && calculateDistance(p1, p2) < interactionRadius;
+        return !p1.equals(p2) && calculateDistance(p1, p2) <= interactionRadius;
     }
 
     // Given a `currentCell` and `otherCell` (could be the same), compute all neighborhoods between their particles and add them to `neighbours`

@@ -37,6 +37,7 @@ public class App {
                 outputWriter.write(stringBuilder.toString());
             }
         }
+        outputWriter.close();
     }
 
     static List<Particle> parseParticles() throws IOException {

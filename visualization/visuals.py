@@ -45,6 +45,8 @@ def main() -> None:
         ax.set_aspect('auto')
         ax.set_xlim([0, 20])
         ax.set_ylim([0, 20])
+        rect = plt.Rectangle((9.4, 0), 1.2, 0.1, facecolor='red')
+        ax.add_patch(rect)
         ax.set_title(f'Time: {t:.2f}')
 
     # Create figure and axes

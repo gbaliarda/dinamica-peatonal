@@ -1,7 +1,7 @@
 [simulation]
 boxLength = 20           # m
 exitWidth = 1.2         # m
-pedestrians = 5       # units
+pedestrians = 200       # units
 minRadius = 0.15        # m
 maxRadius = 0.32        # m
 beta = 0.9
