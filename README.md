@@ -1,6 +1,6 @@
 # Pedestrian Dynamics Model
 
-This simulation is based on the CMP model presented in the paper attached, `CMP_Model.pdf`.
+This simulation is based on the CMP model described in the paper `docs/cmp_model.pdf`.
 
 > An off-lattice automaton for modeling pedestrian dynamics is presented. Pedestrians are represented by disks
 with variable radius that evolve following predefined rules. The key feature of our approach is that although
