@@ -4,11 +4,15 @@ import matplotlib.animation as animation
 from matplotlib.collections import EllipseCollection
 
 def main() -> None:
-    config = load_config()
+    with open("config.toml", "rb") as f:
+        config = tomllib.load(f)
 
     with open(config["files"]["output"], 'r') as file:
         lines = file.readlines()
 
+    EXIT_WIDTH = config["simulation"]["exitWidth"]
+    BOX_LENGTH = config["simulation"]["boxLength"]
+    MIN_RADIUS = config["simulation"]["minRadius"]
     events = {}
     time = None
 
@@ -38,19 +42,24 @@ def main() -> None:
 
         ax.clear()
 
-        # Create the EllipseCollection as a scatter plot, to be able to use the `diameters` array
-        # Ref: https://stackoverflow.com/questions/33094509/correct-sizing-of-markers-in-scatter-plot-to-a-radius-r-in-matplotlib
-        ax.add_collection(EllipseCollection(widths=diameters, heights=diameters, angles=0, units='xy', edgecolors='k', offsets=list(zip(x, y)), transOffset=ax.transData))
+        if len(particles) > 0: # if there are no particles, it will be the final frame
+            # Create the EllipseCollection as a scatter plot, to be able to use the `diameters` array
+            # Ref: https://stackoverflow.com/questions/33094509/correct-sizing-of-markers-in-scatter-plot-to-a-radius-r-in-matplotlib
+            ax.add_collection(EllipseCollection(widths=MIN_RADIUS*2, heights=MIN_RADIUS*2, angles=0, units='xy', edgecolors='none', offsets=list(zip(x, y)), transOffset=ax.transData))
+            ax.add_collection(EllipseCollection(widths=diameters, heights=diameters, angles=0, units='xy', facecolors='none', edgecolors='k', linestyle='dotted', offsets=list(zip(x, y)), transOffset=ax.transData))
+
+        # Draw the exit
+        rect = plt.Rectangle((BOX_LENGTH/2 - EXIT_WIDTH/2, 0), EXIT_WIDTH, 0.15, facecolor='red')
+        ax.add_patch(rect)
 
         ax.set_aspect('auto')
         ax.set_xlim([0, 20])
         ax.set_ylim([0, 20])
-        rect = plt.Rectangle((9.4, 0), 1.2, 0.1, facecolor='red')
-        ax.add_patch(rect)
-        ax.set_title(f'Time: {t:.2f}')
+        ax.set_title(f'Tiempo: {t:.2f} s', fontsize=18)
+        plt.tight_layout()
 
     # Create figure and axes
-    fig, ax = plt.subplots(figsize=(10, 5))
+    fig, ax = plt.subplots(figsize=(10, 10))
 
     # Create animation
     anim = animation.FuncAnimation(fig, update, frames=len(events))
@@ -61,12 +70,6 @@ def main() -> None:
 
     anim.save('out/animation.mp4', writer=writer)
 
-
-def load_config() -> dict[str, any]:
-    with open("config.toml", "rb") as f:
-        config = tomllib.load(f)
-
-    return config
 
 if __name__ == '__main__':
     main()
