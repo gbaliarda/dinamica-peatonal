@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 def main() -> None:
     # Get cumulative exits per time, for different pedestrians' initial positions
-    rounds = 10
+    rounds = 5
     simulations = run_simulations(rounds)
 
     # Plot cumulative exits per time
@@ -13,13 +13,12 @@ def main() -> None:
         times = simulations[j]["times"]
         exits = simulations[j]["exits"]
 
-        plt.plot(times, exits, label=f"Simulación {j+1}")
+        plt.plot(times, exits)
 
     plt.xlabel("Tiempo (s)", fontsize=18)
     plt.ylabel("Egresos", fontsize=18)
 
     plt.tight_layout()
-    plt.legend()
     plt.grid()
     plt.savefig("out/exits_per_dt.png")
     plt.show()
@@ -55,7 +54,7 @@ def main() -> None:
         errors.append(std)
     
     # Plot exit count vs average time, with horizontal error bars
-    plt.errorbar(times, exits, xerr=errors, fmt='o', capsize=4, markersize=4, color="black")
+    plt.errorbar(times, exits, xerr=errors, fmt='o', capsize=3, markersize=4, color="black")
     plt.plot(times, exits)  # Connect markers with straight lines
 
     plt.xlabel("Tiempo (s)", fontsize=18)
