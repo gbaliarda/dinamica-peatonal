@@ -32,14 +32,16 @@ public class App {
         while (pedestrianSystem.hasNextStep()) {
             removedParticles += pedestrianSystem.nextStep();
 
+            double time = pedestrianSystem.getTime();
+
             // Output the cumulative amount of particles that have left the room up to the current time step
-            benchmarkWriter.write(removedParticles + "\n");
+            benchmarkWriter.write(time + " " + removedParticles + "\n");
 
             if (timeSteps++ % Config.getOutputInterval() == 0) {
                 StringBuilder stringBuilder = new StringBuilder();
 
                 // Output time of the current time step
-                stringBuilder.append(pedestrianSystem.getTime()).append("\n");
+                stringBuilder.append(time).append("\n");
 
                 // Output particles' positions, velocities and radii
                 pedestrianSystem.getParticles().forEach(particle -> stringBuilder.append(String.format(Locale.US, "%f %f %f %f\n", particle.getX(), particle.getY(), particle.getV(), particle.getRadius())));
