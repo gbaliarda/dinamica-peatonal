@@ -1,14 +1,14 @@
 import toml
-import json
 import subprocess
 import numpy as np
 import matplotlib.pyplot as plt
 
 def main() -> None:
     # Get cumulative exits per time, for different pedestrians' initial positions
-    rounds = 5
+    rounds = 10
     simulations = run_simulations(rounds)
 
+    # Plot cumulative exits per time
     for j in range(rounds):
         times = simulations[j]["times"]
         exits = simulations[j]["exits"]
@@ -22,6 +22,48 @@ def main() -> None:
     plt.legend()
     plt.grid()
     plt.savefig("out/exits_per_dt.png")
+    plt.show()
+
+    # Compute the average time for each amount of exits, given a step of 10 exits.
+    # E.g. average time for 10 exits, average time for 20 exits, etc.
+    exits_step = 10
+    max_exits = 200
+    average_times = {}
+
+    for j in range(rounds):
+        times = np.array(simulations[j]["times"])
+        exits = np.array(simulations[j]["exits"])
+
+        for exit_count in range(0, max_exits + 1, exits_step):
+            # Find the first occurrance of the given step in the exits array
+            index = np.where(exits >= exit_count)[0][0] # the equality might not exist, so we take the first greater value
+            try:
+                average_times[exit_count].append(times[index])
+            except KeyError:
+                average_times[exit_count] = [times[index]]
+        
+    # Iterate over the `average_times` keys and values, and compute the average time for each exit count
+    exits = []
+    times = []
+    errors = []
+
+    for exit_count, _times in average_times.items():
+        average_time = np.mean(_times)
+        std = np.std(_times)
+        exits.append(exit_count)
+        times.append(average_time)
+        errors.append(std)
+    
+    # Plot exit count vs average time, with horizontal error bars
+    plt.errorbar(times, exits, xerr=errors, fmt='o', capsize=4, markersize=4, color="black")
+    plt.plot(times, exits)  # Connect markers with straight lines
+
+    plt.xlabel("Tiempo (s)", fontsize=18)
+    plt.ylabel("Egresos", fontsize=18)
+
+    plt.tight_layout()
+    plt.grid()
+    plt.savefig("out/avg_exits_per_dt.png")
     plt.show()
 
 
