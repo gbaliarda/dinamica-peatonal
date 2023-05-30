@@ -7,8 +7,9 @@ public class Particle {
     private double v, vdMax;
     private double x, y;
     private double beta;
+    private boolean isOutside;
 
-    public Particle(double minRadius, double maxRadius, double radius, double v, double vdMax, double x, double y, double beta) {
+    public Particle(double minRadius, double maxRadius, double radius, double v, double vdMax, double x, double y, double beta, boolean isOutside) {
         this.minRadius = minRadius;
         this.maxRadius = maxRadius;
         this.radius = radius;
@@ -17,10 +18,11 @@ public class Particle {
         this.x = x;
         this.y = y;
         this.beta = beta;
+        this.isOutside = isOutside;
     }
 
     public Particle copy() {
-        return new Particle(this.minRadius, this.maxRadius, this.radius, this.v, this.vdMax, this.x, this.y, this.beta);
+        return new Particle(this.minRadius, this.maxRadius, this.radius, this.v, this.vdMax, this.x, this.y, this.beta, this.isOutside);
     }
 
     public List<PedestrianSystem.Walls> getWallsInContact() {
@@ -36,7 +38,8 @@ public class Particle {
         double[] xExit = new double[]{Config.getBoxLength() / 2.0 - L / 2, Config.getBoxLength() / 2.0 + L / 2};
 
         // Horizontal walls
-        if (y - radius <= 0 && (x - radius < xExit[0] || x + radius > xExit[1])) // take the exit into account
+        boolean bounceBottomWall = isOutside ? y + radius >= 0 : y - radius <= 0;
+        if (bounceBottomWall && (x - radius < xExit[0] || x + radius > xExit[1])) // take the exit into account
             walls.add(PedestrianSystem.Walls.BOTTOM);
         else if (y + radius >= Config.getBoxLength())
             walls.add(PedestrianSystem.Walls.TOP);
@@ -75,6 +78,12 @@ public class Particle {
 
             for (PedestrianSystem.Walls wall : wallsInContact) {
                 double[] escapeDirectionFromWall = wall.getDirection();
+                // Bottom wall should bounce downwards if particle is outside
+                // FIXME: isOutside is always false
+                if (wall.name().equals(PedestrianSystem.Walls.BOTTOM.name()) && isOutside) {
+                    escapeDirectionFromWall[0] *= -1;
+                    escapeDirectionFromWall[1] *= -1;
+                }
                 particleDirection[0] += escapeDirectionFromWall[0];
                 particleDirection[1] += escapeDirectionFromWall[1];
             }
@@ -85,14 +94,16 @@ public class Particle {
             double xTarget;
 
             double[] decisionInterval = new double[]{xExit[0] + 0.2*L, xExit[0] + 0.8*L};
-            if (x < decisionInterval[0] || x > decisionInterval[1]) {
+            if (!isOutside && (x - radius < decisionInterval[0] || x + radius > decisionInterval[1])) {
                 xTarget = decisionInterval[0] + Math.random() * (decisionInterval[1] - decisionInterval[0]);
             } else {
                 xTarget = x;
             }
-
-            double module = Math.sqrt(Math.pow(x - xTarget, 2) + Math.pow(y - 0, 2)); // yTarget = 0
-            particleDirection = new double[]{(xTarget - x)/module, (0 - y)/module};   // towards the exit
+            if ((x - radius > decisionInterval[0] && x + radius < decisionInterval[1]) && y <= 0)
+                isOutside = true; // Particle exited the room
+            double yTarget = isOutside ? -2 : 0;
+            double module = Math.sqrt(Math.pow(x - xTarget, 2) + Math.pow(y - yTarget, 2));
+            particleDirection = new double[]{(xTarget - x)/module, (yTarget - y)/module};   // towards the exit
         }
 
         double direction = Math.atan2(particleDirection[1], particleDirection[0]);
@@ -110,14 +121,8 @@ public class Particle {
         return new double[]{(x - o.x)/module, (y - o.y)/module}; // eij
     }
 
-    public boolean isOutside() {
-        double L = Config.getExitWidth();
-        double[] xExit = new double[]{Config.getBoxLength() / 2.0 - L / 2, Config.getBoxLength() / 2.0 + L / 2};
-        return (
-            y - radius <= 0 &&
-            x - radius >= xExit[0] &&
-            x + radius <= xExit[1]
-        );
+    public boolean isOutsideSimulation() {
+        return y <= -2;
     }
 
     public double getMinRadius() {

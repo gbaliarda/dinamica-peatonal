@@ -29,7 +29,7 @@ public class App {
         int removedParticles = 0;
 
         // Run the simulation
-        while (pedestrianSystem.hasNextStep()) {
+        while (pedestrianSystem.hasNextStep() && pedestrianSystem.getTime() < 150) { // time < 150 only for testing
             removedParticles += pedestrianSystem.nextStep();
 
             double time = pedestrianSystem.getTime();
@@ -75,7 +75,7 @@ public class App {
             double vdMax = Config.getVdMax();
             double beta = Config.getBeta();
 
-            Particle p = new Particle(minRadius, maxRadius, minRadius, 0, vdMax, x, y, beta);
+            Particle p = new Particle(minRadius, maxRadius, minRadius, 0, vdMax, x, y, beta, false);
 
             particles.add(p);
         });

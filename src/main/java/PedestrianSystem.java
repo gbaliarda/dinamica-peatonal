@@ -68,7 +68,7 @@ public class PedestrianSystem {
 
         // Remove particles that exit the room
         int previousSize = particles.size();
-        particles = particles.stream().filter(particle -> !particle.isOutside()).collect(Collectors.toList());
+        particles = particles.stream().filter(particle -> !particle.isOutsideSimulation()).collect(Collectors.toList());
 
         this.time += dt;
 
