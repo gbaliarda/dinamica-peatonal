@@ -5,7 +5,7 @@ import matplotlib.pyplot as plt
 
 def main() -> None:
     # Get cumulative exits per time, for different pedestrians' initial positions
-    rounds = 5
+    rounds = 10
     simulations = run_simulations(rounds)
 
     # Plot cumulative exits per time

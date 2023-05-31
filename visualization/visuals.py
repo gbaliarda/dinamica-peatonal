@@ -68,7 +68,7 @@ def main() -> None:
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=20, bitrate=1800)
 
-    anim.save('out/animation.mp4', writer=writer)
+    anim.save('out/animation.gif', writer=writer)
 
 
 if __name__ == '__main__':

@@ -3,10 +3,13 @@ import java.util.List;
 import java.util.Objects;
 
 public class Particle {
-    private double minRadius, maxRadius, radius;
-    private double v, vdMax;
+    private final double minRadius;
+    private final double maxRadius;
+    private double radius;
+    private double v;
+    private final double vdMax;
     private double x, y;
-    private double beta;
+    private final double beta;
     private boolean isOutside;
 
     public Particle(double minRadius, double maxRadius, double radius, double v, double vdMax, double x, double y, double beta, boolean isOutside) {
@@ -38,8 +41,7 @@ public class Particle {
         double[] xExit = new double[]{Config.getBoxLength() / 2.0 - L / 2, Config.getBoxLength() / 2.0 + L / 2};
 
         // Horizontal walls
-        boolean bounceBottomWall = !isOutside && y - radius <= 0;
-        if (bounceBottomWall && (x - radius < xExit[0] || x + radius > xExit[1])) // take the exit into account
+        if ((!isOutside && y - radius <= 0) && (x - radius < xExit[0] || x + radius > xExit[1])) // take the exit into account
             walls.add(PedestrianSystem.Walls.BOTTOM);
         else if (y + radius >= Config.getBoxLength())
             walls.add(PedestrianSystem.Walls.TOP);
@@ -89,17 +91,15 @@ public class Particle {
             double xTarget;
 
             double[] decisionInterval = new double[]{xExit[0] + 0.2*L, xExit[0] + 0.8*L};
-            if (!isOutside && (x < decisionInterval[0] || x > decisionInterval[1])) {
+
+            if (!isOutside && (x < decisionInterval[0] || x > decisionInterval[1]))
                 xTarget = decisionInterval[0] + Math.random() * (decisionInterval[1] - decisionInterval[0]);
-            } else {
+            else
                 xTarget = x;
-            }
-            if (!isOutside && isOutsideRoom()) {
-                isOutside = true; // Particle exited the room
-                wentThroughExit = true;
-            }
+
             double yTarget = isOutside ? -2 : 0;
             double module = Math.sqrt(Math.pow(x - xTarget, 2) + Math.pow(y - yTarget, 2));
+
             particleDirection = new double[]{(xTarget - x)/module, (yTarget - y)/module};   // towards the exit
         }
 
@@ -109,6 +109,12 @@ public class Particle {
 
         x += vx * dt;
         y += vy * dt;
+
+        if (!isOutside && isOutsideRoom()) {
+            isOutside = true; // Particle exited the room
+            wentThroughExit = true;
+        }
+
         return wentThroughExit;
     }
 

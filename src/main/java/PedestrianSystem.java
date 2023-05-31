@@ -7,7 +7,7 @@ import java.util.stream.Collectors;
 public class PedestrianSystem {
     private List<Particle> particles;
     private double time;
-    private double dt;
+    private final double dt;
     private int particlesOutside;
 
     public PedestrianSystem(List<Particle> particles) {
@@ -35,7 +35,7 @@ public class PedestrianSystem {
         }
     }
 
-    // Updates particles and returns the amount of particles that left the room during the current time step
+    // Updates particles and returns the amount of particles that left the simulation during the current time step
     public int nextStep() {
         // Check contact between particles
         CellIndexMethod cim = new CellIndexMethod(particles, Config.getBoxLength(), false);
