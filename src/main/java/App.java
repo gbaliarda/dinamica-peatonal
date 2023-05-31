@@ -26,16 +26,15 @@ public class App {
         PedestrianSystem pedestrianSystem = new PedestrianSystem(particles);
 
         int timeSteps = 0;
-        int removedParticles = 0;
 
         // Run the simulation
         while (pedestrianSystem.hasNextStep()) {
-            removedParticles += pedestrianSystem.nextStep();
+            pedestrianSystem.nextStep();
 
             double time = pedestrianSystem.getTime();
 
             // Output the cumulative amount of particles that have left the room up to the current time step
-            benchmarkWriter.write(time + " " + removedParticles + "\n");
+            benchmarkWriter.write(time + " " + pedestrianSystem.getParticlesOutside() + "\n");
 
             if (timeSteps++ % Config.getOutputInterval() == 0) {
                 StringBuilder stringBuilder = new StringBuilder();
@@ -75,7 +74,7 @@ public class App {
             double vdMax = Config.getVdMax();
             double beta = Config.getBeta();
 
-            Particle p = new Particle(minRadius, maxRadius, minRadius, 0, vdMax, x, y, beta);
+            Particle p = new Particle(minRadius, maxRadius, minRadius, 0, vdMax, x, y, beta, false);
 
             particles.add(p);
         });

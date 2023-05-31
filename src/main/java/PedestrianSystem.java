@@ -7,12 +7,14 @@ import java.util.stream.Collectors;
 public class PedestrianSystem {
     private List<Particle> particles;
     private double time;
-    private double dt;
+    private final double dt;
+    private int particlesOutside;
 
     public PedestrianSystem(List<Particle> particles) {
         this.particles = particles;
         Particle sample = particles.get(0);
         this.time = 0;
+        this.particlesOutside = 0;
         this.dt = sample.getMinRadius() / (2*sample.getVdMax()); // s
     }
 
@@ -33,7 +35,7 @@ public class PedestrianSystem {
         }
     }
 
-    // Updates particles and returns the amount of particles that left the room during the current time step
+    // Updates particles and returns the amount of particles that left the simulation during the current time step
     public int nextStep() {
         // Check contact between particles
         CellIndexMethod cim = new CellIndexMethod(particles, Config.getBoxLength(), false);
@@ -59,16 +61,17 @@ public class PedestrianSystem {
 
         // Update particles positions
         for (Particle p: particles) {
-            p.updatePosition(
+            boolean wentThroughExit = p.updatePosition(
                 dt,
                 particlesInContact.getOrDefault(p, Collections.emptyList()),
                 wallsInContact.getOrDefault(p, Collections.emptyList())
             );
+            if (wentThroughExit) particlesOutside++;
         }
 
         // Remove particles that exit the room
         int previousSize = particles.size();
-        particles = particles.stream().filter(particle -> !particle.isOutside()).collect(Collectors.toList());
+        particles = particles.stream().filter(particle -> !particle.isOutsideSimulation()).collect(Collectors.toList());
 
         this.time += dt;
 
@@ -87,4 +90,6 @@ public class PedestrianSystem {
     public double getTime() {
         return time;
     }
+
+    public int getParticlesOutside() { return particlesOutside; }
 }

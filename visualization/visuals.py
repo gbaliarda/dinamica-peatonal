@@ -48,13 +48,13 @@ def main() -> None:
             ax.add_collection(EllipseCollection(widths=MIN_RADIUS*2, heights=MIN_RADIUS*2, angles=0, units='xy', edgecolors='none', offsets=list(zip(x, y)), transOffset=ax.transData))
             ax.add_collection(EllipseCollection(widths=diameters, heights=diameters, angles=0, units='xy', facecolors='none', edgecolors='k', linestyle='dotted', offsets=list(zip(x, y)), transOffset=ax.transData))
 
-        # Draw the exit
-        rect = plt.Rectangle((BOX_LENGTH/2 - EXIT_WIDTH/2, 0), EXIT_WIDTH, 0.15, facecolor='red')
-        ax.add_patch(rect)
+
+        ax.plot([0, BOX_LENGTH/2 - EXIT_WIDTH/2], [0, 0], color='black')
+        ax.plot([BOX_LENGTH/2 + EXIT_WIDTH/2, 20], [0, 0], color='black')
 
         ax.set_aspect('auto')
         ax.set_xlim([0, 20])
-        ax.set_ylim([0, 20])
+        ax.set_ylim([-2, 20])
         ax.set_title(f'Tiempo: {t:.2f} s', fontsize=18)
         plt.tight_layout()
 
