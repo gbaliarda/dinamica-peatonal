@@ -65,8 +65,9 @@ public class Particle {
             v = vdMax * Math.pow(((radius - minRadius) / (maxRadius - minRadius)), beta);
     }
 
-    public void updatePosition(double dt, List<Particle> particlesInContact, List<PedestrianSystem.Walls> wallsInContact) {
+    public boolean updatePosition(double dt, List<Particle> particlesInContact, List<PedestrianSystem.Walls> wallsInContact) {
         double[] particleDirection = new double[]{0, 0};
+        boolean wentThroughExit = false;
 
         boolean isParticleInContact = particlesInContact.size() > 0 || wallsInContact.size() > 0;
         if (isParticleInContact) {
@@ -78,12 +79,6 @@ public class Particle {
 
             for (PedestrianSystem.Walls wall : wallsInContact) {
                 double[] escapeDirectionFromWall = wall.getDirection();
-                // Bottom wall should bounce downwards if particle is outside
-                // FIXME: isOutside is always false
-//                if (wall.name().equals(PedestrianSystem.Walls.BOTTOM.name()) && isOutside) {
-//                    escapeDirectionFromWall[0] *= -1;
-//                    escapeDirectionFromWall[1] *= -1;
-//                }
                 particleDirection[0] += escapeDirectionFromWall[0];
                 particleDirection[1] += escapeDirectionFromWall[1];
             }
@@ -99,8 +94,10 @@ public class Particle {
             } else {
                 xTarget = x;
             }
-            if (isOutside())
+            if (!isOutside && isOutsideRoom()) {
                 isOutside = true; // Particle exited the room
+                wentThroughExit = true;
+            }
             double yTarget = isOutside ? -2 : 0;
             double module = Math.sqrt(Math.pow(x - xTarget, 2) + Math.pow(y - yTarget, 2));
             particleDirection = new double[]{(xTarget - x)/module, (yTarget - y)/module};   // towards the exit
@@ -112,6 +109,7 @@ public class Particle {
 
         x += vx * dt;
         y += vy * dt;
+        return wentThroughExit;
     }
 
     private double[] getEscapeDirection(Particle o) {
@@ -121,13 +119,13 @@ public class Particle {
         return new double[]{(x - o.x)/module, (y - o.y)/module}; // eij
     }
 
-    public boolean isOutside() {
+    public boolean isOutsideRoom() {
         double L = Config.getExitWidth();
         double[] xExit = new double[]{Config.getBoxLength() / 2.0 - L / 2, Config.getBoxLength() / 2.0 + L / 2};
         return (
-                y - radius <= 0 &&
-                x - radius >= xExit[0] &&
-                x + radius <= xExit[1]
+            y - radius <= 0 &&
+            x - radius >= xExit[0] &&
+            x + radius <= xExit[1]
         );
     }
 

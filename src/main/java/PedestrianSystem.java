@@ -8,11 +8,13 @@ public class PedestrianSystem {
     private List<Particle> particles;
     private double time;
     private double dt;
+    private int particlesOutside;
 
     public PedestrianSystem(List<Particle> particles) {
         this.particles = particles;
         Particle sample = particles.get(0);
         this.time = 0;
+        this.particlesOutside = 0;
         this.dt = sample.getMinRadius() / (2*sample.getVdMax()); // s
     }
 
@@ -59,11 +61,12 @@ public class PedestrianSystem {
 
         // Update particles positions
         for (Particle p: particles) {
-            p.updatePosition(
+            boolean wentThroughExit = p.updatePosition(
                 dt,
                 particlesInContact.getOrDefault(p, Collections.emptyList()),
                 wallsInContact.getOrDefault(p, Collections.emptyList())
             );
+            if (wentThroughExit) particlesOutside++;
         }
 
         // Remove particles that exit the room
@@ -87,4 +90,6 @@ public class PedestrianSystem {
     public double getTime() {
         return time;
     }
+
+    public int getParticlesOutside() { return particlesOutside; }
 }

@@ -26,16 +26,15 @@ public class App {
         PedestrianSystem pedestrianSystem = new PedestrianSystem(particles);
 
         int timeSteps = 0;
-        int removedParticles = 0;
 
         // Run the simulation
-        while (pedestrianSystem.hasNextStep() && pedestrianSystem.getTime() < 150) { // time < 150 only for testing
-            removedParticles += pedestrianSystem.nextStep();
+        while (pedestrianSystem.hasNextStep()) { // time < 150 only for testing
+            pedestrianSystem.nextStep();
 
             double time = pedestrianSystem.getTime();
 
             // Output the cumulative amount of particles that have left the room up to the current time step
-            benchmarkWriter.write(time + " " + removedParticles + "\n");
+            benchmarkWriter.write(time + " " + pedestrianSystem.getParticlesOutside() + "\n");
 
             if (timeSteps++ % Config.getOutputInterval() == 0) {
                 StringBuilder stringBuilder = new StringBuilder();
