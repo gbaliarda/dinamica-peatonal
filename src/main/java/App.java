@@ -28,7 +28,7 @@ public class App {
         int timeSteps = 0;
 
         // Run the simulation
-        while (pedestrianSystem.hasNextStep()) { // time < 150 only for testing
+        while (pedestrianSystem.hasNextStep()) {
             pedestrianSystem.nextStep();
 
             double time = pedestrianSystem.getTime();
