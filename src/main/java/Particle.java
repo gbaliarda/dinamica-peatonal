@@ -38,7 +38,7 @@ public class Particle {
         double[] xExit = new double[]{Config.getBoxLength() / 2.0 - L / 2, Config.getBoxLength() / 2.0 + L / 2};
 
         // Horizontal walls
-        boolean bounceBottomWall = isOutside ? y + radius >= 0 : y - radius <= 0;
+        boolean bounceBottomWall = !isOutside && y - radius <= 0;
         if (bounceBottomWall && (x - radius < xExit[0] || x + radius > xExit[1])) // take the exit into account
             walls.add(PedestrianSystem.Walls.BOTTOM);
         else if (y + radius >= Config.getBoxLength())
@@ -80,10 +80,10 @@ public class Particle {
                 double[] escapeDirectionFromWall = wall.getDirection();
                 // Bottom wall should bounce downwards if particle is outside
                 // FIXME: isOutside is always false
-                if (wall.name().equals(PedestrianSystem.Walls.BOTTOM.name()) && isOutside) {
-                    escapeDirectionFromWall[0] *= -1;
-                    escapeDirectionFromWall[1] *= -1;
-                }
+//                if (wall.name().equals(PedestrianSystem.Walls.BOTTOM.name()) && isOutside) {
+//                    escapeDirectionFromWall[0] *= -1;
+//                    escapeDirectionFromWall[1] *= -1;
+//                }
                 particleDirection[0] += escapeDirectionFromWall[0];
                 particleDirection[1] += escapeDirectionFromWall[1];
             }
@@ -94,12 +94,12 @@ public class Particle {
             double xTarget;
 
             double[] decisionInterval = new double[]{xExit[0] + 0.2*L, xExit[0] + 0.8*L};
-            if (!isOutside && (x - radius < decisionInterval[0] || x + radius > decisionInterval[1])) {
+            if (!isOutside && (x < decisionInterval[0] || x > decisionInterval[1])) {
                 xTarget = decisionInterval[0] + Math.random() * (decisionInterval[1] - decisionInterval[0]);
             } else {
                 xTarget = x;
             }
-            if ((x - radius > decisionInterval[0] && x + radius < decisionInterval[1]) && y <= 0)
+            if (isOutside())
                 isOutside = true; // Particle exited the room
             double yTarget = isOutside ? -2 : 0;
             double module = Math.sqrt(Math.pow(x - xTarget, 2) + Math.pow(y - yTarget, 2));
@@ -119,6 +119,16 @@ public class Particle {
         // eij = [x - o.x, y - o.y] / sqrt((x-o.x)**2 + (y-o.y)**2)
         double module = Math.sqrt(Math.pow(x - o.x, 2) + Math.pow(y - o.y, 2));
         return new double[]{(x - o.x)/module, (y - o.y)/module}; // eij
+    }
+
+    public boolean isOutside() {
+        double L = Config.getExitWidth();
+        double[] xExit = new double[]{Config.getBoxLength() / 2.0 - L / 2, Config.getBoxLength() / 2.0 + L / 2};
+        return (
+                y - radius <= 0 &&
+                x - radius >= xExit[0] &&
+                x + radius <= xExit[1]
+        );
     }
 
     public boolean isOutsideSimulation() {
