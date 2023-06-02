@@ -85,13 +85,12 @@ def run_simulations(rounds: int = 3):
 
             # PLot 1 linear regression as an example
             if j == 0 and d == 2.4:
-                plt.scatter(simulations[d][j]["times"][::50], simulations[d][j]["exits"][::50], color='blue', label='Data points')
-                plt.plot(simulations[d][j]["times"][::50], curve[::50], color='red', label='Linear regression')
+                plt.scatter(simulations[d][j]["times"][::50], simulations[d][j]["exits"][::50], color='blue')
+                plt.plot(simulations[d][j]["times"][::50], curve[::50], color='red')
 
                 # Customize the plot
                 plt.xlabel("Tiempo (s)", fontsize=18)
                 plt.ylabel("Egresos", fontsize=18)
-                plt.legend()
 
                 # Save and show the plot
                 plt.savefig("out/exits_dt_regression.png")
