@@ -7,8 +7,28 @@ def main() -> None:
     # Get cumulative exits per time, for different pedestrians' initial positions
     simulations = run_simulations()
 
-    print("\n\n--- AVERAGE FLOW RATES ---")
-    print(simulations)
+    with open("config.toml", "r") as f:
+        config = toml.load(f)
+
+    exit_widths = config["benchmarks"]["exitWidths"]
+    flow_rates = []
+    errors = []
+
+    for d in exit_widths:
+        flow_rates.append(simulations[d]["flow_rate"][0])
+        errors.append(simulations[d]["flow_rate"][1])
+
+    # Plot flow rate vs exit width, with vertical error bars
+    plt.errorbar(exit_widths, flow_rates, yerr=errors, fmt='o', capsize=3, markersize=4, color="black")
+    plt.plot(exit_widths, flow_rates)  # Connect markers with straight lines
+
+    plt.xlabel("Ancho de salida (m)", fontsize=18)
+    plt.ylabel("Caudal (personas/s)", fontsize=18)
+
+    plt.tight_layout()
+    plt.grid()
+    plt.savefig("out/flow_rate_vs_d.png")
+    plt.show()
 
 
 def run_simulations(rounds: int = 3):
@@ -30,29 +50,58 @@ def run_simulations(rounds: int = 3):
         with open("config.toml", "w") as f:
             toml.dump(config, f)
 
-        # Save the times of each round for the current `y`
-        flow_rates = []
+        simulations[d] = {}
 
-        for _ in range(rounds):
-            previous_exits = 0
-            
+        for j in range(rounds):
             # Create particles
             subprocess.run(["python", "generate_pedestrians.py"])
 
             # Run simulation
             subprocess.run(["java", "-jar", "./target/dinamica-peatonal-1.0-SNAPSHOT-jar-with-dependencies.jar"])
 
-            # Save event times
+            # Save exits per dt
             with open(config["files"]["benchmark"], 'r') as file:
                 lines = file.readlines()
+            
+            simulations[d][j] = {}
+            simulations[d][j]["times"] = []
+            simulations[d][j]["exits"] = []
 
             for line in lines:
                 data = line.split()
+                time = float(data[0])
                 cumulative_exits = int(data[1])
-                flow_rates.append(cumulative_exits - previous_exits)
-                previous_exits = cumulative_exits
+                # Take only the times in the stationary period
+                if time >= 10 and time <= 45:
+                    simulations[d][j]["times"].append(time)
+                    simulations[d][j]["exits"].append(cumulative_exits)
 
-        simulations[d] = (np.mean(flow_rates), np.std(flow_rates))
+            # Linear regression
+            coefficients = np.polyfit(simulations[d][j]["times"], simulations[d][j]["exits"], 1)
+            slope = coefficients[0]
+            intercept = coefficients[1]
+            # Calculate the curve of best fit
+            curve = slope * np.array(simulations[d][j]["times"]) + intercept
+
+            # PLot 1 linear regression as an example
+            if j == 0 and d == 2.4:
+                plt.scatter(simulations[d][j]["times"][::50], simulations[d][j]["exits"][::50], color='blue', label='Data points')
+                plt.plot(simulations[d][j]["times"][::50], curve[::50], color='red', label='Linear regression')
+
+                # Customize the plot
+                plt.xlabel("Tiempo (s)", fontsize=18)
+                plt.ylabel("Egresos", fontsize=18)
+                plt.legend()
+
+                # Save and show the plot
+                plt.savefig("out/exits_dt_regression.png")
+                plt.show()
+
+            simulations[d][j]["flow_rate"] = slope
+        
+        # Get the average flow rate for current exit width, and the standard deviation
+        flow_rates = [simulations[d][j]["flow_rate"] for j in range(rounds)]
+        simulations[d]["flow_rate"] = (np.mean(flow_rates), np.std(flow_rates))
 
     return simulations
 
