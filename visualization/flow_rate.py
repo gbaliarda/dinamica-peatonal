@@ -30,6 +30,26 @@ def main() -> None:
     plt.savefig("out/flow_rate_vs_d.png")
     plt.show()
 
+    # Make a linear regression over the previous plot
+    coefficients = np.polyfit(exit_widths, flow_rates, 1)
+    slope = coefficients[0]
+    intercept = coefficients[1]
+    curve = slope * np.array(exit_widths) + intercept
+
+    plt.errorbar(exit_widths, flow_rates, yerr=errors, fmt='o', capsize=3, markersize=4, color="black")
+    plt.plot(exit_widths, curve, color='red', label=f"y = {slope:.2f}d + {intercept:.2f}")
+
+    # Customize the plot
+    plt.xlabel("Ancho de salida (m)", fontsize=18)
+    plt.ylabel("Caudal (personas/s)", fontsize=18)
+
+    # Save and show the plot
+    plt.tight_layout()
+    plt.grid()
+    plt.legend()
+    plt.savefig("out/flow_rate_d_regression.png")
+    plt.show()
+
 
 def run_simulations(rounds: int = 3):
     with open("config.toml", "r") as f:
@@ -86,13 +106,16 @@ def run_simulations(rounds: int = 3):
             # PLot 1 linear regression as an example
             if j == 0 and d == 2.4:
                 plt.scatter(simulations[d][j]["times"][::50], simulations[d][j]["exits"][::50], color='blue')
-                plt.plot(simulations[d][j]["times"][::50], curve[::50], color='red')
+                plt.plot(simulations[d][j]["times"][::50], curve[::50], color='red', label=f"y = {slope:.2f}t + {intercept:.2f}")
 
                 # Customize the plot
                 plt.xlabel("Tiempo (s)", fontsize=18)
                 plt.ylabel("Egresos", fontsize=18)
 
                 # Save and show the plot
+                plt.tight_layout()
+                plt.grid()
+                plt.legend()
                 plt.savefig("out/exits_dt_regression.png")
                 plt.show()
 
