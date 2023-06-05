@@ -48,7 +48,7 @@ public class App {
                 outputWriter.write(stringBuilder.toString());
             }
         }
-
+        System.out.println("Amount of collisions: "+pedestrianSystem.getAmountCollisions());
         benchmarkWriter.close();
         outputWriter.close();
     }

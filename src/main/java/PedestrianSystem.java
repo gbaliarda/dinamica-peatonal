@@ -9,12 +9,14 @@ public class PedestrianSystem {
     private double time;
     private final double dt;
     private int particlesOutside;
+    private long amountCollisions;
 
     public PedestrianSystem(List<Particle> particles) {
         this.particles = particles;
         Particle sample = particles.get(0);
         this.time = 0;
         this.particlesOutside = 0;
+        this.amountCollisions = 0;
         this.dt = sample.getMinRadius() / (2*sample.getVdMax()); // s
     }
 
@@ -40,6 +42,11 @@ public class PedestrianSystem {
         // Check contact between particles
         CellIndexMethod cim = new CellIndexMethod(particles, Config.getBoxLength(), false);
         Map<Particle, List<Particle>> particlesInContact = cim.computeNeighbourhoods();
+        long newAmountCollisions = 0;
+        for (Map.Entry<Particle, List<Particle>> entry : particlesInContact.entrySet()) {
+            newAmountCollisions += entry.getValue().size();
+        }
+        amountCollisions += newAmountCollisions / 2;
 
         // Check contact between particles and walls
         Map<Particle, List<Walls>> wallsInContact = new HashMap<>();
@@ -92,4 +99,6 @@ public class PedestrianSystem {
     }
 
     public int getParticlesOutside() { return particlesOutside; }
+
+    public long getAmountCollisions() { return amountCollisions; }
 }

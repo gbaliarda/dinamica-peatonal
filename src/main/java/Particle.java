@@ -38,13 +38,22 @@ public class Particle {
             walls.add(PedestrianSystem.Walls.RIGHT);
 
         double L = Config.getExitWidth();
-        double[] xExit = new double[]{Config.getBoxLength() / 2.0 - L / 2, Config.getBoxLength() / 2.0 + L / 2};
-
-        // Horizontal walls
-        if ((!isOutside && y - radius <= 0) && (x - radius < xExit[0] || x + radius > xExit[1])) // take the exit into account
-            walls.add(PedestrianSystem.Walls.BOTTOM);
-        else if (y + radius >= Config.getBoxLength())
-            walls.add(PedestrianSystem.Walls.TOP);
+        if (Config.getAmountDoors() == 1) {
+            double[] xExit = new double[]{Config.getBoxLength() / 2.0 - L / 2, Config.getBoxLength() / 2.0 + L / 2};
+            // Horizontal walls
+            if ((!isOutside && y - radius <= 0) && (x - radius < xExit[0] || x + radius > xExit[1])) // take the exit into account
+                walls.add(PedestrianSystem.Walls.BOTTOM);
+            else if (y + radius >= Config.getBoxLength())
+                walls.add(PedestrianSystem.Walls.TOP);
+        } else {
+            double[] xExitLeft = new double[]{Config.getBoxLength() / 4.0 - L/2, Config.getBoxLength() / 4.0 + L/2};
+            double[] xExitRight = new double[]{Config.getBoxLength() * 3 / 4.0 -L/2, Config.getBoxLength() * 3 / 4.0 + L/2};
+            // Horizontal walls
+            if ((!isOutside && y - radius <= 0) && (x - radius < xExitLeft[0] || (x + radius > xExitLeft[1] && x-radius < xExitRight[0]) || x + radius > xExitRight[1]))
+                walls.add(PedestrianSystem.Walls.BOTTOM);
+            else if (y + radius >= Config.getBoxLength())
+                walls.add(PedestrianSystem.Walls.TOP);
+        }
 
         return walls;
     }
@@ -86,21 +95,45 @@ public class Particle {
             }
         } else {
             double L = Config.getExitWidth();
-            // Exit is in the center of the bottom wall
-            double[] xExit = new double[]{Config.getBoxLength() / 2.0 - L / 2, Config.getBoxLength() / 2.0 + L / 2};
             double xTarget;
+            // Exit is in the center of the bottom wall
+            if (Config.getAmountDoors() == 1) {
+                double[] xExit = new double[]{Config.getBoxLength() / 2.0 - L / 2, Config.getBoxLength() / 2.0 + L / 2};
 
-            double[] decisionInterval = new double[]{xExit[0] + 0.2*L, xExit[0] + 0.8*L};
+                double[] decisionInterval = new double[]{xExit[0] + 0.2 * L, xExit[0] + 0.8 * L};
 
-            if (!isOutside && (x < decisionInterval[0] || x > decisionInterval[1]))
-                xTarget = decisionInterval[0] + Math.random() * (decisionInterval[1] - decisionInterval[0]);
-            else
-                xTarget = x;
+                if (!isOutside && (x < decisionInterval[0] || x > decisionInterval[1]))
+                    xTarget = decisionInterval[0] + Math.random() * (decisionInterval[1] - decisionInterval[0]);
+                else
+                    xTarget = x;
 
+                double yTarget = isOutside ? -2 : 0;
+                double module = Math.sqrt(Math.pow(x - xTarget, 2) + Math.pow(y - yTarget, 2));
+
+                particleDirection = new double[]{(xTarget - x) / module, (yTarget - y) / module};   // towards the exit
+            } else {
+                double[] xExitLeft = new double[]{Config.getBoxLength() / 4.0 -L/2, Config.getBoxLength() / 4.0 + L/2};
+                double[] xExitRight = new double[]{Config.getBoxLength() * 3 / 4.0 -L/2, Config.getBoxLength() * 3 / 4.0 + L/2};
+
+                double[] leftDecisionInterval = new double[]{xExitLeft[0] + 0.2 * L, xExitLeft[0] + 0.8 * L};
+                double[] rightDecisionInterval = new double[]{xExitRight[0] + 0.2 * L, xExitRight[0] + 0.8 * L};
+
+                boolean leftDoor = x < leftDecisionInterval[0] || (x > leftDecisionInterval[1] && x < Config.getBoxLength()/2.0);
+                boolean rightDoor = x > rightDecisionInterval[1] || (x < rightDecisionInterval[0] && x >= Config.getBoxLength()/2.0);
+
+                if (!isOutside && (leftDoor || rightDoor)) {
+                    if (leftDoor) {
+                        xTarget = leftDecisionInterval[0] + Math.random() * (leftDecisionInterval[1] - leftDecisionInterval[0]);
+                    } else {
+                        xTarget = rightDecisionInterval[0] + Math.random() * (rightDecisionInterval[1] - rightDecisionInterval[0]);
+                    }
+                } else
+                    xTarget = x;
+            }
             double yTarget = isOutside ? -2 : 0;
             double module = Math.sqrt(Math.pow(x - xTarget, 2) + Math.pow(y - yTarget, 2));
 
-            particleDirection = new double[]{(xTarget - x)/module, (yTarget - y)/module};   // towards the exit
+            particleDirection = new double[]{(xTarget - x) / module, (yTarget - y) / module};   // towards the exit
         }
 
         double direction = Math.atan2(particleDirection[1], particleDirection[0]);
@@ -128,11 +161,18 @@ public class Particle {
     public boolean isOutsideRoom() {
         double L = Config.getExitWidth();
         double[] xExit = new double[]{Config.getBoxLength() / 2.0 - L / 2, Config.getBoxLength() / 2.0 + L / 2};
-        return (
-            y - radius <= 0 &&
-            x - radius >= xExit[0] &&
-            x + radius <= xExit[1]
-        );
+        double[] xExitLeft = new double[]{Config.getBoxLength() / 4.0 -L/2, Config.getBoxLength() / 4.0 + L/2};
+        double[] xExitRight = new double[]{Config.getBoxLength() * 3 / 4.0 -L/2, Config.getBoxLength() * 3 / 4.0 + L/2};
+        if (Config.getAmountDoors() == 1)
+            return (
+                y - radius <= 0 &&
+                x - radius >= xExit[0] &&
+                x + radius <= xExit[1]
+            );
+        else return (
+                y - radius <= 0 &&
+                ((x - radius >= xExitLeft[0] && x + radius <= xExitLeft[1]) || (x - radius >= xExitRight[0] && x + radius <= xExitRight[1]))
+            );
     }
 
     public boolean isOutsideSimulation() {

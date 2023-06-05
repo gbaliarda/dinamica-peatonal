@@ -10,6 +10,7 @@ public class Config {
     private static double beta;
     private static String staticFile, outputFile, benchmarkFile;
     private static long outputInterval;
+    private static long amountDoors;
 
     static {
         try {
@@ -23,6 +24,7 @@ public class Config {
             vdMax = toml.getDouble("simulation.vdMax");
             beta = toml.getDouble("simulation.beta");
             outputInterval = toml.getLong("simulation.outputInterval");
+            amountDoors = toml.getLong("simulation.amountDoors");
             staticFile = toml.getString("files.staticInput");
             outputFile = toml.getString("files.output");
             benchmarkFile = toml.getString("files.benchmark");
@@ -74,4 +76,6 @@ public class Config {
     public static String getBenchmarkFile() {
         return benchmarkFile;
     }
+
+    public static long getAmountDoors() { return amountDoors; }
 }

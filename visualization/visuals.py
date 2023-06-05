@@ -49,8 +49,9 @@ def main() -> None:
             ax.add_collection(EllipseCollection(widths=diameters, heights=diameters, angles=0, units='xy', facecolors='none', edgecolors='k', linestyle='dotted', offsets=list(zip(x, y)), transOffset=ax.transData))
 
 
-        ax.plot([0, BOX_LENGTH/2 - EXIT_WIDTH/2], [0, 0], color='black')
-        ax.plot([BOX_LENGTH/2 + EXIT_WIDTH/2, 20], [0, 0], color='black')
+        ax.plot([0, BOX_LENGTH/4 - EXIT_WIDTH/2], [0, 0], color='black')
+        ax.plot([BOX_LENGTH/4 + EXIT_WIDTH/2, BOX_LENGTH*3/4-EXIT_WIDTH/2], [0, 0], color='black')
+        ax.plot([BOX_LENGTH*3/4+EXIT_WIDTH/2, BOX_LENGTH], [0, 0], color='black')
 
         ax.set_aspect('auto')
         ax.set_xlim([0, 20])
@@ -68,7 +69,7 @@ def main() -> None:
     Writer = animation.writers['ffmpeg']
     writer = Writer(fps=20, bitrate=1800)
 
-    anim.save('out/animation.gif', writer=writer)
+    anim.save('out/animation.mp4', writer=writer)
 
 
 if __name__ == '__main__':
