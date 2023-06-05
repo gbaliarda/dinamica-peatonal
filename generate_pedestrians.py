@@ -13,7 +13,7 @@ with open("config.toml", "rb") as f:
 
 def generate_static_file():
     # Grid Length/maxDiameter x Length/maxDiameter
-    amount_cells = math.ceil(BOX_LENGTH / (PEDESTRIAN_MAX_RADIUS * 2))
+    amount_cells = math.floor(BOX_LENGTH / (PEDESTRIAN_MAX_RADIUS * 2))
     grid = np.zeros((amount_cells, amount_cells))
 
     with open(STATIC_FILE, "w") as f:
