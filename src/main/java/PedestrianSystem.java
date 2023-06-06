@@ -54,6 +54,7 @@ public class PedestrianSystem {
             List<Walls> walls = p.getWallsInContact();
             if (walls.size() > 0)
                 wallsInContact.put(p, walls);
+            amountCollisions += walls.size();
         }
 
         for (Particle p : particles) {
