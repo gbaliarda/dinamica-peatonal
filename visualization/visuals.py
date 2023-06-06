@@ -56,6 +56,8 @@ def main() -> None:
         ax.set_xlim([0, 20])
         ax.set_ylim([-2, 20])
         ax.set_title(f'Tiempo: {t:.2f} s', fontsize=18)
+        ax.xaxis.set_tick_params(labelsize=18)
+        ax.yaxis.set_tick_params(labelsize=18)
         plt.tight_layout()
 
     # Create figure and axes
