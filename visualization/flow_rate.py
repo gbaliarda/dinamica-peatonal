@@ -56,6 +56,43 @@ def main() -> None:
     plt.savefig("out/flow_rate_d_regression.png")
     plt.show()
 
+    min_slope = 2.4
+    max_slope = 3.0
+    step = 0.01
+    slope_values = np.arange(min_slope, max_slope, step)
+    slope_errors = []
+    best_slope = 2.4
+    error_best_slope = None
+
+    for slope in slope_values:
+        regression_error = 0
+        for i in np.arange(len(exit_widths)):
+            x = exit_widths[i]
+            y = flow_rates[i]
+            regression_error += pow(y - slope * x, 2)
+
+        
+        if error_best_slope == None or error_best_slope > regression_error:
+            best_slope = slope
+            error_best_slope = regression_error
+        
+        slope_errors.append(regression_error)
+    
+    plt.plot(slope_values, slope_errors)
+    plt.xlabel('Pendiente', fontsize=18)
+    plt.ylabel('E(Pendiente)', fontsize=18)
+    plt.savefig("out/error_regression.png")
+    plt.show()
+
+    plt.errorbar(exit_widths, flow_rates, yerr=errors, fmt='o', capsize=3, markersize=4, color="black")
+    plt.plot(exit_widths, [best_slope * x for x in exit_widths], color='red', label=f"y = {best_slope:.2f}d")
+    plt.xlabel('Ancho de salida (m)', fontsize=18)
+    plt.ylabel('Caudal (personas/s)', fontsize=18)
+    plt.legend()
+
+    plt.tight_layout()
+    plt.show()
+
 
 def run_simulations(config, rounds: int = 3):
     exit_width = config["benchmarks"]["exitWidths"]
